@@ -10,12 +10,11 @@ class TodoList extends Component {
     state = {
         items: [],
         deletedTodo: '',
-        isedit: true
+        index: -1
     }
 
 
     componentDidUpdate(prevProps) {
-        console.log("humking", prevProps);
         if (this.props.todoItem !== prevProps.todoItem) {
             this.setState({ items: this.state.items.concat(this.props.todoItem) })
         }
@@ -29,13 +28,20 @@ class TodoList extends Component {
         this.setState({items: items})
     }
 
-    editHandler = () => {
-        console.log("bbb","working");
-       this.setState({isedit:false});
+    editHandler = (key) => {
+       this.setState({index: key});
     }
 
     inputHandler = (event) => {
         console.log("Yyyttttt", event.target.value);
+        const updatedItems = this.state.items.map((item,index)=>{
+            if(this.state.index===index){
+            item = event.target.value;
+            }
+            return item
+        })
+
+        this.setState({items: updatedItems});
     }
 
 
@@ -44,7 +50,7 @@ class TodoList extends Component {
 
         if (this.state.items.length > 0) {
             todos = this.state.items.map((item, index) => {
-                return <TodoItem key={index} todo={item} isEdit={this.state.isedit} editTodo={this.editHandler} inputChange={this.inputHandler} deleteTodo={this.removeHandler} i={index} />
+                return <TodoItem key={index} todo={item} isEdit={this.state.index===index ? false: true} editTodo={this.editHandler} inputChange={this.inputHandler} deleteTodo={this.removeHandler} i={index} />
             })
         }
 
