@@ -1,66 +1,58 @@
 
-import React, { Component } from 'react';
-import TodoItem from '../../components/TodoItem/TodoItem'
-class TodoList extends Component {
+import React, { useState, useEffect } from 'react';
+import TodoItem from '../../components/TodoItem/TodoItem';
 
-    constructor(props) {
-        super()
+
+const TodoList = (props) => {
+
+    const [state, setstate] = useState({ items: [], deletedTodo: "", index: -1 });
+
+    useEffect(() => {
+            setstate({
+                items: state.items.concat(props.todoItem),
+                deleteTodo: "",
+                index: -1
+            })
+
+
+    }, [props.todoItem])
+
+
+    const removeHandler = (prop) => {
+        const items = [...state.items];
+        items.splice(prop.i, 1);
+        setstate({ items: items,deleteTodo:"",index:-1 })
     }
 
-    state = {
-        items: [],
-        deletedTodo: '',
-        index: -1
+    const editHandler = (key) => {
+        setstate({ items:state.items,deletedTodo:"",index: key });
     }
 
-
-    componentDidUpdate(prevProps) {
-        if (this.props.todoItem !== prevProps.todoItem) {
-            this.setState({ items: this.state.items.concat(this.props.todoItem) })
-        }
-
-
-    }
-
-    removeHandler = (prop) => {
-        const items = [...this.state.items];
-        items.splice(prop.i,1);
-        this.setState({items: items})
-    }
-
-    editHandler = (key) => {
-       this.setState({index: key});
-    }
-
-    inputHandler = (event) => {
-        console.log("Yyyttttt", event.target.value);
-        const updatedItems = this.state.items.map((item,index)=>{
-            if(this.state.index===index){
-            item = event.target.value;
+    const inputHandler = (event) => {
+        const updatedItems = state.items.map((item, index) => {
+            if (state.index === index) {
+                item = event.target.value;
             }
             return item
         })
-
-        this.setState({items: updatedItems});
+        setstate({ items: updatedItems,deletedTodo:"",index:state.index });
     }
 
 
-    render() {
-        let todos;
+    let todos;
 
-        if (this.state.items.length > 0) {
-            todos = this.state.items.map((item, index) => {
-                return <TodoItem key={index} todo={item} isEdit={this.state.index===index ? false: true} editTodo={this.editHandler} inputChange={this.inputHandler} deleteTodo={this.removeHandler} i={index} />
-            })
-        }
-
-        return (
-            <div>
-                {this.state.items.length > 0 ? todos : null}
-            </div >
-        )
-
+    if (state.items && state.items.length > 0) {
+        todos = state.items.map((item, index) => {
+            return <TodoItem key={index} todo={item} isEdit={state.index === index ? false : true} editTodo={editHandler} inputChange={inputHandler} deleteTodo={removeHandler} i={index} />
+        })
     }
+
+    return (
+        <div>
+            {state.items && state.items.length > 0 ? todos : null}
+        </div >
+    )
+
 }
 
 export default TodoList

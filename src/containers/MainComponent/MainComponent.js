@@ -1,37 +1,33 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import TodoCreater from '../../components/TodoCreater/TodoCreater';
 import TodoList from '../TodoList/TodoList';
 import './MainComponent.css';
 
-class MainComponent extends Component {
+const MainComponent = ()=> {
 
-    state = {
-        sendTodo: '',
-        initialText: ''
+    const [sendTodo, setsendTodo] = useState('');
+    const [initialText, setinitialText] = useState('');
+
+    const inputHandler = (event) => {
+        setinitialText(event.target.value);
+    }
+
+    const createTodo = () => {
+        setsendTodo(initialText);
+        setinitialText('');
+
     }
 
 
-    inputHandler = (event) => {
-        this.setState({ initialText: event.target.value })
-    }
-
-    createTodo = () => {
-        this.setState({ sendTodo: this.state.initialText, initialText: '' });
-
-    }
-
-
-
-    render() {
         return (
             <div className="center">
                 <div style={{ "padding": "15px" }}>Todo App</div>
-                <TodoCreater inputChange={this.inputHandler} addTodo={this.createTodo}
-                    inputVal={this.state.initialText} />
-                <TodoList todoItem={this.state.sendTodo} />
+                <TodoCreater inputChange={inputHandler} addTodo={createTodo}
+                    inputVal={initialText} />
+                    {sendTodo !== '' ? <TodoList todoItem={sendTodo} /> : null }
+                
             </div>
         )
-    }
 }
 
 export default MainComponent
