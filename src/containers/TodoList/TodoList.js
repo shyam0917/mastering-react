@@ -1,6 +1,8 @@
 
 import React, { Component } from 'react';
-import TodoItem from '../../components/TodoItem/TodoItem'
+import TodoItem from '../../components/TodoItem/TodoItem';
+import { connect } from 'react-redux';
+import * as actionTypes from '../../store/actions';
 class TodoList extends Component {
 
     constructor(props) {
@@ -8,59 +10,64 @@ class TodoList extends Component {
     }
 
     state = {
-        items: [],
-        deletedTodo: '',
         index: -1
     }
 
 
-    componentDidUpdate(prevProps) {
-        if (this.props.todoItem !== prevProps.todoItem) {
-            this.setState({ items: this.state.items.concat(this.props.todoItem) })
-        }
-
-
-    }
 
     removeHandler = (prop) => {
-        const items = [...this.state.items];
-        items.splice(prop.i,1);
-        this.setState({items: items})
+        console.log(prop);
+        const items = this.props.todoList;
+        items.splice(prop.i, 1);
+        this.props.updateList(items);
+        this.forceUpdate();
     }
 
     editHandler = (key) => {
-       this.setState({index: key});
+        this.setState({ index: key });
     }
 
     inputHandler = (event) => {
-        console.log("Yyyttttt", event.target.value);
-        const updatedItems = this.state.items.map((item,index)=>{
-            if(this.state.index===index){
-            item = event.target.value;
+        const updatedItems = this.props.todoList.map((item, index) => {
+            if (this.state.index === index) {
+                item = event.target.value;
             }
             return item
         })
+        this.props.updateList(updatedItems);
 
-        this.setState({items: updatedItems});
     }
 
 
     render() {
         let todos;
 
-        if (this.state.items.length > 0) {
-            todos = this.state.items.map((item, index) => {
-                return <TodoItem key={index} todo={item} isEdit={this.state.index===index ? false: true} editTodo={this.editHandler} inputChange={this.inputHandler} deleteTodo={this.removeHandler} i={index} />
+        if (this.props.todoList.length > 0) {
+            todos = this.props.todoList.map((item, index) => {
+                return <TodoItem key={index} todo={item} isEdit={this.state.index === index ? false : true} editTodo={this.editHandler} inputChange={this.inputHandler} deleteTodo={this.removeHandler} i={index} />
             })
         }
 
         return (
             <div>
-                {this.state.items.length > 0 ? todos : null}
+                {this.props.todoList.length > 0 ? todos : null}
             </div >
         )
 
     }
 }
 
-export default TodoList
+const mapStateToProps = (state) => {
+    return {
+        todoList: state.todoItems
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        removeTodo: (todo) => dispatch({ type: actionTypes.REMOVE_TODO, todo: todo }),
+        updateList: (todoList) => dispatch({ type: actionTypes.Update_TODO, todoList: todoList })
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(TodoList)
